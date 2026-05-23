@@ -50,7 +50,7 @@ def init_store(power_system, times, data):
     # store the problem info read from the spreadsheets
     for key, df in list(data.items()):
         if key != "scenario_values":
-            for k, v in (df.dtypes == object).iterkv():
+            for k, v in (df.dtypes == object).items():
                 if v:
                     df[k] = df[k].fillna("")
 
@@ -226,5 +226,5 @@ def _add_tbl_val(storage, tablename, index, value):
 
 
 def table_append(store, name, newvals):
-    store[name] = store[name].append(newvals)
+    store[name] = pd.concat([store[name], newvals])
     return

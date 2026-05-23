@@ -19,20 +19,10 @@ from pandas import DataFrame, Series, date_range
 from pprint import pprint
 
 try:  # for development
-    from ipdb import set_trace  # pudb
-    import IPython
-    from IPython.frontend.terminal.embed import InteractiveShellEmbed
-
-    #    from IPython.config.loader import Config
-    #
-    #    cfg = Config()
-    #    cfg.InteractiveShellEmbed.prompt_in1="myprompt [\\#]> "
-    #    cfg.InteractiveShellEmbed.prompt_out="myprompt [\\#]: "
-    #    cfg.InteractiveShellEmbed.profile=ipythonprofile
-    ipython_shell = (
-        InteractiveShellEmbed()
-    )  # config=cfg, user_ns=namespace, banner2=banner)
-except:
+    from ipdb import set_trace
+    from IPython.terminal.embed import InteractiveShellEmbed
+    ipython_shell = InteractiveShellEmbed()
+except Exception:
     from pdb import set_trace
 
 
@@ -108,9 +98,12 @@ def ts_from_csv(
 ):
     kwargs["header"] = 0 if is_df else None
 
-    return pd.read_csv(
-        filename, index_col=index_col, squeeze=squeeze, parse_dates=[0], **kwargs
+    result = pd.read_csv(
+        filename, index_col=index_col, parse_dates=[0], **kwargs
     )
+    if squeeze and isinstance(result, pd.DataFrame) and result.shape[1] == 1:
+        return result.iloc[:, 0]
+    return result
 
 
 def bool_to_int(x):

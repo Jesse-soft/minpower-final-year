@@ -22,13 +22,13 @@ def initial_dispatch(directory=".", output_filename="initial.csv"):
     # get rid of a bunch of stuff to make this an ED problem
     generators_data["power"] = None
     loads_data["power"] = None
-    for i, snm in generators_data.pop("schedulename").dropna().iterkv():
+    for i, snm in generators_data.pop("schedulename").dropna().items():
         generators_data.loc[i, "power"] = timeseries[snm].values[0]
 
-    for i, snm in loads_data.pop("schedulename").dropna().iterkv():
+    for i, snm in loads_data.pop("schedulename").dropna().items():
         loads_data.loc[i, "power"] = timeseries[snm].values[0]
 
-    for i, snm in generators_data.pop("observedname").dropna().iterkv():
+    for i, snm in generators_data.pop("observedname").dropna().items():
         generators_data.loc[i, "power"] = timeseries[snm].values[0]
 
     valid_columns = pd.Index(
