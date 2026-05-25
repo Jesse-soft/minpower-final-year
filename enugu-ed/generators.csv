@@ -1,0 +1,6 @@
+name,heat rate equation,P min,P max,fuel cost
+OjiRiver-Coal-IPP,1800+30P+0.003P^2,20,350,0.6
+Fedikore-Gas-IPP,1400+36P+0.0028P^2,5,10,1.1
+Tempo-Gas-IPP,1350+34P+0.0026P^2,3,5,1.05
+EEDC-Diesel-Backup,3800+60P+0.007P^2,2,15,2.2
+UNN-Campus-Diesel,4000+65P+0.008P^2,1,8,2.5

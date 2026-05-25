@@ -1,0 +1,4 @@
+name,from bus,to bus,reactance,P max
+OjiRiver-Enugu-132kV,OjiRiver,Enugu,0.09,200
+Enugu-Nsukka-132kV,Enugu,Nsukka,0.11,150
+OjiRiver-Nsukka-33kV,OjiRiver,Nsukka,0.18,80

@@ -1,0 +1,6 @@
+name,heat rate equation,P min,P max,fuel cost
+EEDC-Nsukka-Feeder,1200+28P+0.002P^2,5,40,0.9
+UNN-Campus-Diesel-1,4000+65P+0.008P^2,1,4,2.5
+UNN-Campus-Diesel-2,4000+65P+0.008P^2,1,4,2.5
+Nsukka-Solar-Rooftop,500+2P+0.0005P^2,0,2,0.05
+LocalIPP-Gas-Proposed,1300+33P+0.0025P^2,3,20,1.0

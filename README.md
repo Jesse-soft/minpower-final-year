@@ -2,7 +2,7 @@
 
 A Python-based toolkit for solving power systems optimization problems, adapted and modernized for academic use at the Department of Electrical Engineering, Faculty of Engineering, University of Nigeria, Nsukka.
 
-This project builds on the open-source [Minpower](https://github.com/adamgreenhall/minpower) toolkit originally developed by Adam Greenhall, extending it with a structured setup guide, worked examples for Nigerian power system contexts, and compatibility updates for Python 3.12 and modern dependencies.
+This project builds on the open-source [Minpower](https://github.com/adamgreenhall/minpower) toolkit originally developed by Adam Greenhall, extending it with a structured setup guide, Enugu/Nsukka-specific worked examples, compatibility updates for Python 3.12, and an original Nigerian Power System Extension.
 
 ---
 
@@ -12,17 +12,35 @@ Minpower solves three classical power systems optimization problems:
 
 | Problem | Description |
 |--------|-------------|
-| **Economic Dispatch (ED)** | Allocates generation across units at minimum cost for a single time period |
-| **Optimal Power Flow (OPF)** | ED with transmission network (line flow) constraints |
-| **Unit Commitment (UC)** | Schedules generator on/off status and dispatch over multiple time periods |
+| **Economic Dispatch (ED)** | Allocates generation across units at minimum cost |
+| **Optimal Power Flow (OPF)** | ED with transmission network constraints |
+| **Unit Commitment (UC)** | Schedules generator on/off status over multiple time periods |
 
-Problems are defined entirely in CSV spreadsheets — no optimization code required from the user.
+Problems are defined entirely in CSV spreadsheets — no coding required.
 
 ---
 
-## Quickstart (Recommended)
+## Nigerian Power System Extension (`nigeria.py`)
 
-The fastest way to get started is the one-command setup script:
+An original contribution that wraps Minpower's output with Nigerian and Enugu State-specific analysis:
+
+- Costs in both **Naira (N)** and **USD** side by side
+- **Load shedding analysis** reflecting EEDC supply conditions
+- **Cost per kWh** compared against EERC/NERC Band A tariff
+- **Fuel type breakdown** — Coal, Gas, Diesel, Hydro, Solar
+- **Voltage level classification** — 330kV, 132kV, 33kV, 11kV
+- Enugu State grid context (EERC regulated, EEDC distributed)
+- Saves `nigeria_report.txt` per run
+
+### Usage
+
+```bash
+python3 nigeria.py <problem_folder> --solver cbc --rate 1600
+```
+
+---
+
+## Quickstart
 
 ```bash
 git clone https://github.com/Jesse-soft/minpower-final-year.git
@@ -31,179 +49,137 @@ chmod +x setup_env.sh
 ./setup_env.sh
 ```
 
-This sets up everything automatically. See [Setup Script](#setup-script) for details.
-
 ---
 
-## Manual Setup
+## Sample Problems — Enugu State & Nsukka
 
-### Requirements
+### 1. Enugu State Economic Dispatch (`enugu-ed/`)
 
-- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/download)
-- Git
+Models Enugu State's generation mix including:
+- **Oji River Coal IPP** (350 MW proposed — locally sourced Enugu coal)
+- **Fedikore Gas IPP** (10 MW — first IPP licensed by EERC, 2024)
+- **Tempo Power Gas** (5 MW — EERC licensed, 2025)
+- **EEDC Diesel Backup** (emergency supply)
+- **UNN Campus Diesel** (University of Nigeria standby generation)
 
-### Step 1 — Clone the repo
-
-```bash
-git clone https://github.com/Jesse-soft/minpower-final-year.git
-cd minpower-final-year
-```
-
-### Step 2 — Create the conda environment
+Loads: Enugu City, Nsukka Township, UNN Campus, 9th Mile Corner, Agbani, Udi, Awgu
 
 ```bash
-conda create -n minpower python=3.10 pandas=1.5.3 matplotlib pyomo -c conda-forge -y
-conda activate minpower
-```
-
-### Step 3 — Install the solver and dependencies
-
-```bash
-conda install -c conda-forge coincbc -y
-pip install cylp tables xarray setuptools
-```
-
-### Step 4 — Install the package
-
-```bash
-pip install -e .
-```
-
-### Step 5 — Configure matplotlib backend
-
-```bash
-echo "export MPLBACKEND=Agg" >> ~/.bashrc
-echo "conda activate minpower" >> ~/.bashrc
-source ~/.bashrc
+python3 nigeria.py enugu-ed/ --solver cbc --rate 1600
 ```
 
 ---
 
-## Usage
+### 2. Enugu 132kV Transmission Network (`enugu-opf/`)
 
-Activate the environment first (automatic if you ran the setup script):
-
-```bash
-conda activate minpower
-```
-
-Then run any problem:
+Models the Enugu State transmission network:
+- **Buses:** Oji River, Enugu City, Nsukka
+- **Lines:** Oji River–Enugu 132kV, Enugu–Nsukka 132kV, Oji River–Nsukka 33kV
 
 ```bash
-minpower <path_to_problem_folder> --solver cbc
-```
-
-Minpower reads the CSV files in the folder, detects the problem type automatically, solves it, and outputs:
-- A results spreadsheet (`.csv`) in the problem folder
-- A Matplotlib plot (`.png`) in the problem folder
-
----
-
-## Problem Folder Structure
-
-| File | Required for | Description |
-|------|-------------|-------------|
-| `generators.csv` | ED, OPF, UC | Generator parameters (pmin, pmax, cost curve, etc.) |
-| `loads.csv` | ED, OPF, UC | Load demand (MW) |
-| `lines.csv` | OPF only | Transmission line parameters |
-| `initial.csv` | UC only | Initial generator on/off status |
-
----
-
-## Examples
-
-### Economic Dispatch
-
-```bash
-minpower minpower/tests/ed-WW-3-7/ --solver cbc
-```
-
-Expected output:
-```
-objective cost=4866.425
-total cost of generation=4866.42507
-```
-
-### Optimal Power Flow
-
-```bash
-minpower minpower/tests/opf/ --solver cbc
-```
-
-### Unit Commitment
-
-```bash
-minpower minpower/tests/uc/ --solver cbc
+python3 nigeria.py enugu-opf/ --solver cbc --rate 1600
 ```
 
 ---
 
-## Viewing Results
+### 3. Nsukka Local Supply (`nsukka-ed/`)
 
-After running, open the problem folder. You will find:
+A Nsukka/UNN-focused dispatch problem showing the local supply reality:
+- EEDC Nsukka Feeder (grid supply)
+- UNN Campus Diesel generators
+- Nsukka solar rooftop generation
+- Proposed local gas IPP
 
-- `dispatch.csv` — numerical results
-- `dispatch.png` — visual dispatch chart
+Loads: UNN Academic Area, Halls of Residence, Nsukka Market, Odim Street, Staff Quarters
 
-In VS Code or GitHub Codespaces, click the `.png` file to preview it inline.
+```bash
+python3 nigeria.py nsukka-ed/ --solver cbc --rate 1600
+```
+
+---
+
+## Standard Minpower Problems (Wood & Wollenberg Textbook)
+
+```bash
+minpower minpower/tests/ed-WW-3-7/ --solver cbc   # 3-generator ED
+minpower minpower/tests/opf/ --solver cbc           # 3-bus OPF
+```
+
+---
+
+## Creating Your Own Problem
+
+Make a folder and add CSV files:
+
+**generators.csv (ED)**
+```
+name,heat rate equation,P min,P max,fuel cost
+gen1,500+10P+0.02P^2,50,200,1.0
+gen2,300+8P+0.015P^2,30,150,0.9
+```
+
+**loads.csv**
+```
+name,power
+load,300
+```
+
+```bash
+python3 nigeria.py my-problem/ --solver cbc --rate 1600
+```
+
+Minpower auto-detects ED, OPF, or UC from the files present.
+
+---
+
+## Setup Script
+
+Run `setup_env.sh` to install everything from scratch:
+
+```bash
+chmod +x setup_env.sh
+./setup_env.sh
+```
+
+Installs: conda environment (Python 3.10, pandas 1.5.3), CBC solver, all dependencies.
 
 ---
 
 ## Project Structure
 
 ```
-minpower/
-├── get_data.py         # CSV ingestion (Input module)
-├── generators.py       # Generator models
-├── powersystems.py     # Bus, Load, Line, PowerSystem models
-├── optimization.py     # Pyomo abstraction layer (Model/Solver module)
-├── solve.py            # Main entry point and CLI
-├── results.py          # Output: CSV results + Matplotlib plots
-├── config.py           # Configuration and solver settings
-├── standalone.py       # Multi-stage rolling UC support
-├── bidding.py          # Piecewise cost curve handling
-├── stochastic.py       # Stochastic UC with scenario trees
-└── tests/              # 15+ test cases (ED, OPF, UC variants)
+minpower/               # Core Minpower solver (adapted from Greenhall)
+nigeria.py              # Nigerian Power System Extension (original)
+enugu-ed/               # Enugu State ED problem (Oji River, Fedikore, Tempo)
+enugu-opf/              # Enugu 132kV network OPF
+nsukka-ed/              # Nsukka/UNN local supply ED
+setup_env.sh            # One-command environment setup
+deploy_nigeria.sh       # Deploys Nigerian extension
 ```
-
----
-
-## Setup Script
-
-The setup_env.sh script automates the entire installation:
-
-- Checks if conda is installed and guides you if not
-- Creates a minpower conda environment with Python 3.10 and pandas 1.5.3
-- Installs the CBC solver via conda-forge
-- Installs all Python dependencies
-- Configures MPLBACKEND=Agg for headless plot saving
-- Sets the environment to auto-activate on terminal startup
-- Runs a test solve to confirm everything works
 
 ---
 
 ## Compatibility Notes
 
-This version has been updated from the original. Changes made:
-
-- SafeConfigParser replaced with ConfigParser (removed in Python 3.12)
-- squeeze=True removed from pd.read_csv() (removed in pandas 2.0)
-- .iterkv() replaced with .items() (removed from pandas)
-- DataFrame.append() replaced with pd.concat() (removed in pandas 2.0)
-- pkg_resources replaced with importlib.metadata fallback
-- freq="H" corrected to freq="h" (pandas 3.x change)
-- IPython import path updated for modern IPython
-- Regex strings in bidding.py corrected to raw strings
+Updated from original Minpower for Python 3.10 and modern dependencies:
+- `SafeConfigParser` replaced with `ConfigParser` (Python 3.12)
+- `squeeze=True` removed from `pd.read_csv()` (pandas 2.0)
+- `.iterkv()` replaced with `.items()` (pandas)
+- `DataFrame.append()` replaced with `pd.concat()` (pandas 2.0)
+- `pkg_resources` fallback to `importlib.metadata`
+- `freq="H"` corrected to `freq="h"` (pandas 3.x)
 
 ---
 
 ## Credits
 
-- Original Minpower toolkit: Adam Greenhall (https://github.com/adamgreenhall/minpower) — MIT License
-- Adaptation, documentation, and modernization: Onyedire Jesse Kenneth — EEE592 Final Year Project, Department of Electrical Engineering, Faculty of Engineering, University of Nigeria, Nsukka, 2025
+- Original Minpower toolkit: [Adam Greenhall](https://github.com/adamgreenhall/minpower) — MIT License
+- Adaptation, Nigerian extension, and modernization: Onyedire Jesse Kenneth
+  EEE592 Final Year Project, Department of Electrical Engineering,
+  Faculty of Engineering, University of Nigeria, Nsukka, 2025
 
 ---
 
 ## License
 
-MIT License — see LICENSE for details.
+MIT License — see `LICENSE` for details.

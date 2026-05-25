@@ -1,0 +1,4 @@
+name,bus,heat rate equation,P min,P max,fuel cost
+OjiRiver-Coal-IPP,OjiRiver,1800+30P+0.003P^2,20,350,0.6
+Fedikore-Gas-IPP,Enugu,1400+36P+0.0028P^2,5,10,1.1
+EEDC-Diesel-Backup,Nsukka,3800+60P+0.007P^2,2,15,2.2
